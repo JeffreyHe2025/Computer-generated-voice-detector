@@ -154,7 +154,7 @@ if __name__ == "__main__":
         test_file = "human voice.mp3" # Replace with your file path if it changes
         
         if os.path.exists(test_file):
-            print(f"\nAnalyzing {test_file} using newly trained model...")
+            print(f"\nAnalyzing '{test_file}' using newly trained model...")
             features = extract_mel_spectrogram(test_file)
             
             if features is not None:
@@ -170,4 +170,4 @@ if __name__ == "__main__":
                 else:
                     print("Result: This sounds like a Human voice.")
         else:
-            print(f"Test file not found at {test_file}. Check the path.")
+            print(f"Test file not found at '{test_file}'. Check the path.")
