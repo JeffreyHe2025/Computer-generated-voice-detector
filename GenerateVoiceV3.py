@@ -4,8 +4,18 @@ from elevenlabs import save
 import os
 
 # 1. Set up the ElevenLabs client with your API key
-client = ElevenLabs(api_key="sk_f2f39330358251559869066ec182c289e094a054e32f5063")
 
+from dotenv import load_dotenv
+
+
+# Load the variables from the .env file into your environment
+load_dotenv() 
+
+# Securely fetch the key
+my_api_key = os.getenv("ELEVENLABS_API_KEY")
+
+# Initialize the client
+client = ElevenLabs(api_key=my_api_key)
 # 2. Load the TSV file containing the transcripts
 # Make sure this points to where you saved the Common Voice data
 tsv_path = "C:/Users/jeffr/Downloads/human voices large collection/cv-corpus-24.0-2025-12-05/en/train.tsv"
@@ -31,7 +41,33 @@ df_high_quality.drop(["down_votes"],inplace=True,axis=1)
 df_high_quality.info()
 df_high_quality.to_csv("new_data.tsv", sep='\t', index=False)
 #print(df_high_quality['accents'].value_counts().to_string()) #find how many different accents there are in the file, then compare to ElevenLabs to see which accents are avaliable
-print(df_high_quality['age'].value_counts().to_string())
+
+
+
+top_26_accents = df_high_quality['accents'].value_counts().head(26).index
+
+# 2. Get rows 29-31
+specific_accents = df_high_quality['accents'].value_counts().iloc[28:31].index
+
+# 3. Combine them together into one master list
+combined_accents = list(top_26_accents) + list(specific_accents)
+
+# 4. Filter the dataframe using the combined list
+df_high_quality = df_high_quality[df_high_quality['accents'].isin(combined_accents)]
+
+df_high_quality['accents'] = df_high_quality['accents'].str.replace('English', '', case=False).str.strip()
+accent_mapping = {
+    'United States': 'American',
+    'England': 'British',
+    'New Zealand': 'Kiwi',
+
+}
+df_high_quality['accents'] = df_high_quality['accents'].replace(accent_mapping)
+df_high_quality = df_high_quality[df_high_quality['accents'] != 'Eastern European']
+print(df_high_quality['accents'].value_counts().to_string())
+
+
+
 
 
 df_high_quality['gender'] = df_high_quality['gender'].str.replace('male_masculine', 'male').str.replace('female_feminine', 'female')
@@ -47,18 +83,22 @@ age_map = {
     'eighties': '85-year-old',
     'nineties': '95-year-old'
 }
-df['age'] = df['age'].map(age_map).fillna(df['age'])
+df_high_quality['age'] = df_high_quality['age'].map(age_map).fillna(df_high_quality['age'])
 
-"""for index, row in df_high_quality.iterrows():
+"""for index, row in df_high_quality.head(10).iterrows():
+    
     # 1. Format the text prompt for the voice design
-    voice_prompt = f"A {row['age']} {row['gender']} with a {row['accents']} accent."
-    print(f"Designing voice for row {index}: {voice_prompt}")
+    voice_prompt = "A "+ row['age']+" "+ row['gender']+ " with a "+row['accents'] +" accent."
+    
+    
+    
     
     # 2. Call the Voice Design endpoint
+    # We pass row['sentence'] so it uses your actual text to generate the preview
     previews = client.text_to_voice.design(
-        model_id="eleven_multilingual_ttv_v2",
+        model_id="eleven_multilingual_v2", # Note: use standard multilingual model ID
         voice_description=voice_prompt,
-        text=dummy_preview_text 
+        text=row['sentence'] 
     )
     
     # 3. Save the generated preview to your account to get a usable voice_id
@@ -70,7 +110,7 @@ df['age'] = df['age'].map(age_map).fillna(df['age'])
         generated_voice_id=generated_id
     )
     
-    # 4. Generate the actual dialogue (your specific sentence) using the newly created voice
+    # 4. Generate the actual dialogue using the newly created voice
     print(f"Generating audio for sentence: '{row['sentence']}'")
     audio_generator = client.text_to_speech.convert(
         text=row['sentence'],
@@ -86,8 +126,8 @@ df['age'] = df['age'].map(age_map).fillna(df['age'])
                 f.write(chunk)
                 
     # 5. CRITICAL: Delete the voice to free up your voice slot limit
-    client.voices.delete(voice_id=temp_voice.voice_id)"""
-
+    client.voices.delete(voice_id=temp_voice.voice_id)
+    print(f"Finished and deleted Temp_DF_Voice_{index}\n")"""
 
 
 

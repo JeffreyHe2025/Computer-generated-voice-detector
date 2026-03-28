@@ -4,8 +4,18 @@ from elevenlabs import save
 import os
 
 # 1. Set up the ElevenLabs client with your API key
-client = ElevenLabs(api_key="sk_f2f39330358251559869066ec182c289e094a054e32f5063")
+import os
+from dotenv import load_dotenv
+from elevenlabs.client import ElevenLabs
 
+# Load the variables from the .env file into your environment
+load_dotenv() 
+
+# Securely fetch the key
+my_api_key = os.getenv("ELEVENLABS_API_KEY")
+
+# Initialize the client
+client = ElevenLabs(api_key=my_api_key)
 # 2. Load the TSV file containing the transcripts
 # Make sure this points to where you saved the Common Voice data
 tsv_path = "C:/Users/jeffr/Downloads/human voices large collection/cv-corpus-24.0-2025-12-05/en/train.tsv"
