@@ -94,10 +94,11 @@ age_map = {
     'nineties': '95-year-old'
 }
 df_high_quality['age'] = df_high_quality['age'].map(age_map).fillna(df_high_quality['age'])
-
+df_high_quality.drop(['client_id'],inplace=True,axis=1)
+df_high_quality.to_csv("df_high_quality_pre_placeholder.tsv", sep='\t', index=False)
 
 #placeholder to bypass ElevenLabs 100-character minimum
-placeholder = " Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien vitae pellentesque"
+"""placeholder = " this is a placeholder this is a placeholder this is a placeholder this is a placeholder"
 
 df_high_quality['design_sentence'] = df_high_quality['sentence'] + placeholder
 
@@ -144,7 +145,7 @@ for index, row in df_high_quality.head(10).iterrows():
                 f.write(chunk)
                 
     # 5. CRITICAL: Delete the voice to free up your voice slot limit
-    client.voices.delete(voice_id=temp_voice.voice_id)
+    client.voices.delete(voice_id=temp_voice.voice_id)"""
     
 
 
