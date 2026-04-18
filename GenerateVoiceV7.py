@@ -1,34 +1,14 @@
 import pandas as pd
-from elevenlabs.client import ElevenLabs
-from elevenlabs import save
 import os
-
-from dotenv import load_dotenv
-
-
-
-
-
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-env_path = os.path.join(script_dir, "key.env")
-
-
-load_dotenv(env_path)
-
-
-my_api_key = os.getenv("ElevenLabsKey")
-
-
-
-client = ElevenLabs(api_key=my_api_key)
-
-
-
+import torch
+from parler_tts import ParlerTTSForConditionalGeneration
+from transformers import AutoTokenizer
+import soundfile as sf
 
 
 tsv_path = "C:/Users/jeffr/Downloads/human voices large collection/cv-corpus-24.0-2025-12-05/en/train.tsv"
 df = pd.read_csv(tsv_path, sep='\t')
+
 
 df.drop(['variant'],inplace=True,axis=1)
 df.drop(['locale'],inplace=True,axis=1)
@@ -41,19 +21,12 @@ df = df.dropna(subset=["age", "gender", "accents"])
 df = df[df['gender'].isin(['male_masculine', 'female_feminine'])]
 df['sentence'] = df['sentence'].str.replace('"', '')
 
-
-
 df_high_quality = df[(df["up_votes"] > 2) & (df["down_votes"] == 0)]
 df_high_quality.drop(["up_votes"],inplace=True,axis=1)
 df_high_quality.drop(["down_votes"],inplace=True,axis=1)
 
 df_high_quality.info()
 df_high_quality.to_csv("new_data.tsv", sep='\t', index=False)
-#print(df_high_quality['accents'].value_counts().to_string()) #find how many different accents there are in the file, then compare to ElevenLabs to see which accents are avaliable
-
-
-
-
 
 df_high_quality['accents'] = df_high_quality['accents'].str.replace('English', '', case=False).str.strip()
 accent_mapping = {
@@ -61,24 +34,14 @@ accent_mapping = {
     'England': 'British',
     'New Zealand': 'Kiwi',
     'nigeria': 'Nigerian'
-
 }
 df_high_quality['accents'] = df_high_quality['accents'].replace(accent_mapping)
 df_high_quality = df_high_quality[df_high_quality['accents'] != 'Eastern European']
 
 top_26_accents = df_high_quality['accents'].value_counts().head(26).index
-
-
 specific_accents = df_high_quality['accents'].value_counts().iloc[28:31].index
-
-
 combined_accents = list(top_26_accents) + list(specific_accents)
-
-
 df_high_quality = df_high_quality[df_high_quality['accents'].isin(combined_accents)]
-
-
-
 
 df_high_quality['gender'] = df_high_quality['gender'].str.replace('male_masculine', 'male').str.replace('female_feminine', 'female')
 
@@ -97,62 +60,40 @@ df_high_quality['age'] = df_high_quality['age'].map(age_map).fillna(df_high_qual
 df_high_quality.drop(['client_id'],inplace=True,axis=1)
 df_high_quality.to_csv("df_high_quality_pre_placeholder.tsv", sep='\t', index=False)
 df_high_quality.info()
-#placeholder to bypass ElevenLabs 100-character minimum
-placeholder = " this is a placeholder this is a placeholder this is a placeholder this is a placeholder"
 
-df_high_quality['design_sentence'] = df_high_quality['sentence'] + placeholder
 
+
+print("Loading Parler-TTS model into memory...")
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+repo_id = "parler-tts/parler-tts-mini-v1"
+
+model = ParlerTTSForConditionalGeneration.from_pretrained(repo_id).to(device)
+tokenizer = AutoTokenizer.from_pretrained(repo_id)
+print(f"Model loaded successfully on {device.upper()}!")
 
 output_dir = "ai_clips"
 os.makedirs(output_dir, exist_ok=True)
+
+
 for index, row in df_high_quality.head(10).iterrows():
+    print(f"Processing row {index}...")
+    
+   
+    voice_prompt = f"A {row['age']} {row['gender']} speaker with a {row['accents']} accent delivers their words clearly. The recording is of very high quality."
+    text_to_read = row['sentence']
+    
+   
+    input_ids = tokenizer(voice_prompt, return_tensors="pt").input_ids.to(device)
+    prompt_input_ids = tokenizer(text_to_read, return_tensors="pt").input_ids.to(device)
     
     
-    voice_prompt = "A "+ row['age']+" "+ row['gender']+ " with a "+row['accents'] +" accent."
+    generation = model.generate(input_ids=input_ids, prompt_input_ids=prompt_input_ids)
     
+   
+    audio_arr = generation.cpu().numpy().squeeze()
     
-    
-    
-  
-    previews = client.text_to_voice.design(
-        model_id="eleven_multilingual_ttv_v2", 
-        voice_description=voice_prompt,
-        text=row['design_sentence']  
-    )
-    
-    
-    generated_id = previews.previews[0].generated_voice_id
-    
-    temp_voice = client.text_to_voice.create(
-        voice_name=f"Temp_DF_Voice_{index}",
-        voice_description=voice_prompt,
-        generated_voice_id=generated_id
-    )
-    
-    
-    
-    audio_generator = client.text_to_speech.convert(
-        text=row['sentence'],       
-        voice_id=temp_voice.voice_id,
-        model_id="eleven_multilingual_v2" 
-    )
-    
-    # Save the output audio file
-    filename = f"output_row_{index}.mp3"
-    with open(filename, "wb") as f:
-        for chunk in audio_generator:
-            if chunk:
-                f.write(chunk)
-                
-    client.voices.delete(voice_id=temp_voice.voice_id)
-    
+   
+    filename = os.path.join(output_dir, f"output_row_{index}.wav")
+    sf.write(filename, audio_arr, model.config.sampling_rate)
 
-
-
-
-
-
-
-
-
-
+print("end")
