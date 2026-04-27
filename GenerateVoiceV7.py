@@ -75,11 +75,11 @@ output_dir = "ai_clips"
 os.makedirs(output_dir, exist_ok=True)
 
 
-for index, row in df_high_quality.head(10).iterrows():
+for index, row in df_high_quality.head(100).iterrows():
     print(f"Processing row {index}...")
     
    
-    voice_prompt = f"A {row['age']} {row['gender']} speaker with a {row['accents']} accent delivers their words clearly. The recording is of very high quality."
+    voice_prompt = f"A {row['age']} {row['gender']} speaker with a {row['accents']} accent."
     text_to_read = row['sentence']
     
    
