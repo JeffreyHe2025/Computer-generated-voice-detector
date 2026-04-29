@@ -6,11 +6,11 @@ from transformers import AutoTokenizer
 import soundfile as sf
 
 
-tsv_path = "C:/Users/jeffr/Downloads/human voices large collection/cv-corpus-24.0-2025-12-05/en/train.tsv"
+tsv_path = "/Users/jeffreyhe/Downloads/Computer-generated-voice-detector-main/df_high_quality_pre_placeholder.tsv"
 df = pd.read_csv(tsv_path, sep='\t')
 
 
-df.drop(['variant'],inplace=True,axis=1)
+"""df.drop(['variant'],inplace=True,axis=1)
 df.drop(['locale'],inplace=True,axis=1)
 df.drop(['segment'],inplace=True,axis=1)
 df.drop(['sentence_domain'],inplace=True,axis=1)
@@ -59,7 +59,7 @@ age_map = {
 df_high_quality['age'] = df_high_quality['age'].map(age_map).fillna(df_high_quality['age'])
 df_high_quality.drop(['client_id'],inplace=True,axis=1)
 df_high_quality.to_csv("df_high_quality_pre_placeholder.tsv", sep='\t', index=False)
-df_high_quality.info()
+df_high_quality.info()"""
 
 
 
@@ -74,26 +74,28 @@ print(f"Model loaded successfully on {device.upper()}!")
 output_dir = "ai_clips"
 os.makedirs(output_dir, exist_ok=True)
 
+human_clips_dir = "filtered_human_clips"
 
-for index, row in df_high_quality.head(100).iterrows():
-    print(f"Processing row {index}...")
+for index, row in df.iterrows():
     
-   
-    voice_prompt = f"A {row['age']} {row['gender']} speaker with a {row['accents']} accent."
-    text_to_read = row['sentence']
-    
-   
-    input_ids = tokenizer(voice_prompt, return_tensors="pt").input_ids.to(device)
-    prompt_input_ids = tokenizer(text_to_read, return_tensors="pt").input_ids.to(device)
+    audio_filename = row['path'] 
+    human_audio_path = os.path.join(human_clips_dir, audio_filename)
     
     
-    generation = model.generate(input_ids=input_ids, prompt_input_ids=prompt_input_ids)
+    if os.path.exists(human_audio_path):
+        print(f"Processing row {index} (Found {audio_filename})...")
+        
+        voice_prompt = f"A {row['age']} {row['gender']} speaker with a {row['accents']} accent delivers their words clearly. The recording is of very high quality."
+        text_to_read = row['sentence']
+        
+        input_ids = tokenizer(voice_prompt, return_tensors="pt").input_ids.to(device)
+        prompt_input_ids = tokenizer(text_to_read, return_tensors="pt").input_ids.to(device)
+        
+        generation = model.generate(input_ids=input_ids, prompt_input_ids=prompt_input_ids)
+        
+        audio_arr = generation.cpu().numpy().squeeze()
+        
+        filename = os.path.join(output_dir, f"output_row_{index}.wav")
+        sf.write(filename, audio_arr, model.config.sampling_rate)
     
-   
-    audio_arr = generation.cpu().numpy().squeeze()
-    
-   
-    filename = os.path.join(output_dir, f"output_row_{index}.wav")
-    sf.write(filename, audio_arr, model.config.sampling_rate)
-
 print("end")

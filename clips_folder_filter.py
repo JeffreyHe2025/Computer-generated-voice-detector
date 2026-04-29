@@ -3,13 +3,13 @@ import pandas as pd
 import shutil
 
 
-tsv_path = "C:/Users/jeffr/OneDrive/Documents/Desktop/AI voice detector/df_high_quality_pre_placeholder.tsv"
+tsv_path = "/Users/jeffreyhe/Downloads/Computer-generated-voice-detector-main/df_high_quality_pre_placeholder.tsv"
 
 
-source_folder = "C:/Users/jeffr/Downloads/human voices large collection/cv-corpus-24.0-2025-12-05/en/clips"
+source_folder = "/Users/jeffreyhe/commonvoice/cv-corpus-25.0-2026-03-09/en/clips"
 
 
-new_folder = "C:/Users/jeffr/OneDrive/Documents/Desktop/AI voice detector/filtered_human_clips"
+new_folder = "/Users/jeffreyhe/Downloads/Computer-generated-voice-detector-main/filtered_human_clips"
 
 
 os.makedirs(new_folder, exist_ok=True)
