@@ -1,0 +1,14 @@
+*.env
+
+# Data folders — audio datasets are too large for git
+ai_clips/
+filtered_human_clips/
+mlaad_clips/
+
+# Loose audio files at the project root (not inside subfolders)
+/*.mp3
+/*.wav
+/*.flac
+/*.m4a
+/*.aac
+/*.ogg

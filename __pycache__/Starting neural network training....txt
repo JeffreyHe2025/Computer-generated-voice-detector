@@ -1,0 +1,31 @@
+Starting neural network training...
+Epoch 1/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 3s 136ms/step - accuracy: 0.8039 - loss: 1.1809 - val_accuracy: 0.8462 - val_loss: 11.5338
+Epoch 2/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - accuracy: 0.8235 - loss: 0.4117 - val_accuracy: 0.8462 - val_loss: 16.6618
+Epoch 3/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.9020 - loss: 0.5724 - val_accuracy: 0.8462 - val_loss: 15.8987
+Epoch 4/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - accuracy: 0.9608 - loss: 0.2414 - val_accuracy: 0.8462 - val_loss: 16.2937
+Epoch 5/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.9020 - loss: 0.5856 - val_accuracy: 0.8462 - val_loss: 18.6801
+Epoch 6/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.9216 - loss: 0.1527 - val_accuracy: 0.8462 - val_loss: 22.3531
+Epoch 7/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.9216 - loss: 0.2470 - val_accuracy: 0.8462 - val_loss: 20.5619
+Epoch 8/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.9412 - loss: 0.6522 - val_accuracy: 0.8462 - val_loss: 18.5251
+Epoch 9/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.9216 - loss: 0.4025 - val_accuracy: 0.8462 - val_loss: 16.6226
+Epoch 10/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.9412 - loss: 0.1750 - val_accuracy: 0.8462 - val_loss: 12.6804
+Epoch 11/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - accuracy: 0.9608 - loss: 0.3927 - val_accuracy: 0.8462 - val_loss: 11.5050
+Epoch 12/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - accuracy: 1.0000 - loss: 0.0029 - val_accuracy: 0.8462 - val_loss: 10.6347
+Epoch 13/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - accuracy: 1.0000 - loss: 0.0018 - val_accuracy: 0.8462 - val_loss: 9.8750
+Epoch 14/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - accuracy: 0.9608 - loss: 0.1068 - val_accuracy: 0.8462 - val_loss: 8.5070
+Epoch 15/15
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - accuracy: 0.9804 - loss: 0.0553 - val_accuracy: 0.8462 - val_loss: 7.7253
